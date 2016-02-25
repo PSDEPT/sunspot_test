@@ -135,11 +135,25 @@ describe SunspotTest do
     describe ".solr_running" do
       context "if solr is running" do
         before do
-          Net::HTTP.stub(get:true)
+          response = double("response")
+          Net::HTTP.stub(get_response: response)
+          allow(response).to receive(:code) { '200' }
         end
 
         it "returns true" do
           expect(SunspotTest.send(:solr_running?)).to eq(true)
+        end
+      end
+
+      context "if solr is loading" do
+        before do
+          response = double("response")
+          Net::HTTP.stub(get_response: response)
+          allow(response).to receive(:code) { '503' }
+        end
+
+        it "returns false" do
+          expect(SunspotTest.send(:solr_running?)).to eq(false)
         end
       end
 
