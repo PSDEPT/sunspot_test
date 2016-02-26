@@ -22,10 +22,12 @@ module SunspotTest
     end
 
     def start_sunspot_server
+      puts "Starting solr server"
       unless solr_running?
         pid = fork do
           STDERR.reopen("/dev/null")
           STDOUT.reopen("/dev/null")
+          puts "Executing server.run"
           server.run
         end
 
