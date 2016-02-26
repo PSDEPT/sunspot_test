@@ -60,6 +60,7 @@ module SunspotTest
     end
 
     def wait_until_solr_starts
+      puts "Waiting for solr to start"
       (solr_startup_timeout * 10).times do
         break if solr_running?
         sleep(0.1)
@@ -68,9 +69,11 @@ module SunspotTest
     end
 
     def solr_running?
+      puts "solr_running?"
       begin
         solr_ping_uri = URI.parse("#{Sunspot.session.config.solr.url}/admin/ping")
         response = Net::HTTP.get_response(solr_ping_uri)
+        puts "response: #{response.inspect}"
         response.code != '503' # Solr Running
       rescue
         false # Solr Not Running
