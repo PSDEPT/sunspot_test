@@ -12,6 +12,14 @@ module SunspotTest
       @solr_startup_timeout || 15
     end
 
+    def logger
+      Rails.logger
+    end
+
+    def log(msg)
+      logger.info "[sunspot_test] #{msg}"
+    end
+
     def setup_solr
       unstub
       start_sunspot_server
@@ -22,12 +30,12 @@ module SunspotTest
     end
 
     def start_sunspot_server
-      puts "Starting solr server"
+      log "Starting solr server"
       unless solr_running?
         pid = fork do
           STDERR.reopen("/dev/null")
           STDOUT.reopen("/dev/null")
-          puts "Executing server.run"
+          log "Executing server.run"
           server.run
         end
 
@@ -60,7 +68,7 @@ module SunspotTest
     end
 
     def wait_until_solr_starts
-      puts "Waiting for solr to start"
+      log "Waiting for solr to start"
       (solr_startup_timeout * 10).times do
         break if solr_running?
         sleep(0.1)
@@ -69,11 +77,11 @@ module SunspotTest
     end
 
     def solr_running?
-      puts "solr_running?"
+      log "solr_running?"
       begin
         solr_ping_uri = URI.parse("#{Sunspot.session.config.solr.url}/admin/ping")
         response = Net::HTTP.get_response(solr_ping_uri)
-        puts "response: #{response.inspect}"
+        log "response: #{response.inspect}"
         response.code != '503' # Solr Running
       rescue
         false # Solr Not Running
